@@ -1,0 +1,26 @@
+﻿@{
+    ViewData["Title"] = "Đặt hàng thành công";
+    int orderId = ViewBag.OrderId;
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-8 text-center">
+        <div class="card shadow-sm border-success">
+            <div class="card-body py-5">
+                <i class="bi bi-check-circle-fill text-success" style="font-size: 80px;"></i>
+                <h2 class="mt-3">Đặt hàng thành công!</h2>
+                <p class="lead">Cảm ơn bạn đã mua sắm tại Lam Shop</p>
+                <p>Mã đơn hàng của bạn: <strong class="fs-4">#@orderId</strong></p>
+                <p>Chúng tôi sẽ liên hệ xác nhận đơn hàng trong thời gian sớm nhất.</p>
+                <div class="mt-4">
+                    <a href="@Url.Action("Detail", "Order", new { id = orderId })" class="btn btn-info">
+                        <i class="bi bi-receipt"></i> Theo dõi đơn hàng
+                    </a>
+                    <a href="@Url.Action("Index", "Product")" class="btn btn-primary ms-2">
+                        <i class="bi bi-shop"></i> Tiếp tục mua sắm
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

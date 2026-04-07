@@ -1,0 +1,120 @@
+﻿@using SV22T1020040.Models.Sales
+@using SV22T1020040.Shop
+@using SV22T1020040.Shop.Extensions
+@using SV22T1020040.Shop.Models
+@model SV22T1020040.Models.Common.PagedResult<SV22T1020040.Models.Sales.OrderViewInfo>
+@{
+    ViewData["Title"] = "Đơn hàng của tôi";
+    int? currentStatus = ViewBag.CurrentStatus;
+}
+
+<div class="row">
+    <div class="col-md-3">
+        <div class="list-group">
+            <a href="@Url.Action("Profile", "ShopAccount")" class="list-group-item list-group-item-action">
+                <i class="bi bi-person"></i> Thông tin cá nhân
+            </a>
+            <a href="@Url.Action("ChangePassword", "ShopAccount")" class="list-group-item list-group-item-action">
+                <i class="bi bi-key"></i> Đổi mật khẩu
+            </a>
+            <a href="@Url.Action("Index", "Order")" class="list-group-item list-group-item-action active">
+                <i class="bi bi-receipt"></i> Đơn hàng của tôi
+            </a>
+        </div>
+    </div>
+    <div class="col-md-9">
+        <div class="card shadow-sm">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="bi bi-clock-history"></i> Lịch sử đơn hàng</h5>
+            </div>
+            <div class="card-body">
+                <div class="btn-group mb-3">
+                    <a href="@Url.Action("Index", new { status = (int?)null })" class="btn btn-outline-secondary @(currentStatus == null ? "active" : "")">Tất cả</a>
+                    <a href="@Url.Action("Index", new { status = 1 })" class="btn btn-outline-secondary @(currentStatus == 1 ? "active" : "")">Chờ duyệt</a>
+                    <a href="@Url.Action("Index", new { status = 2 })" class="btn btn-outline-secondary @(currentStatus == 2 ? "active" : "")">Đã duyệt</a>
+                    <a href="@Url.Action("Index", new { status = 3 })" class="btn btn-outline-secondary @(currentStatus == 3 ? "active" : "")">Đang giao</a>
+                    <a href="@Url.Action("Index", new { status = 4 })" class="btn btn-outline-secondary @(currentStatus == 4 ? "active" : "")">Hoàn tất</a>
+                    <a href="@Url.Action("Index", new { status = -1 })" class="btn btn-outline-secondary @(currentStatus == -1 ? "active" : "")">Đã hủy</a>
+                </div>
+
+                @if (Model.DataItems.Count == 0)
+                {
+                    <div class="alert alert-info text-center">
+                        <i class="bi bi-inbox"></i> Bạn chưa có đơn hàng nào.
+                    </div>
+                }
+                else
+                {
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Mã đơn</th>
+                                    <th>Ngày đặt</th>
+                                    <th>Ngày duyệt</th>
+                                    <th>Tổng tiền</th>
+                                    <th>Trạng thái</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var order in Model.DataItems)
+                                {
+                                    <tr>
+                                        <td>#@order.OrderID</td>
+                                        <td>@order.OrderTime.ToString("dd/MM/yyyy HH:mm")</td>
+                                        <td>@(order.AcceptTime?.ToString("dd/MM/yyyy HH:mm") ?? "--")</td>
+                                        <td class="text-end fw-bold">@order.TotalPrice.ToString("#,##0") đ</td>
+                                        <td>
+                                            @switch (order.Status)
+                                            {
+                                                case OrderStatusEnum.New:
+                                                    <span class="badge bg-warning text-dark">Chờ duyệt</span>
+                                                    break;
+                                                case OrderStatusEnum.Accepted:
+                                                    <span class="badge bg-primary">Đã duyệt</span>
+                                                    break;
+                                                case OrderStatusEnum.Shipping:
+                                                    <span class="badge bg-info">Đang giao</span>
+                                                    break;
+                                                case OrderStatusEnum.Completed:
+                                                    <span class="badge bg-success">Hoàn tất</span>
+                                                    break;
+                                                case OrderStatusEnum.Cancelled:
+                                                    <span class="badge bg-secondary">Đã hủy</span>
+                                                    break;
+                                                case OrderStatusEnum.Rejected:
+                                                    <span class="badge bg-danger">Bị từ chối</span>
+                                                    break;
+                                            }
+                                        </td>
+                                        <td>
+                                            <a href="@Url.Action("Detail", new { id = order.OrderID })" class="btn btn-sm btn-primary">
+                                                <i class="bi bi-eye"></i> Chi tiết
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    @if (Model.PageCount > 1)
+                    {
+                        <nav>
+                            <ul class="pagination justify-content-center">
+                                @for (int i = 1; i <= Model.PageCount; i++)
+                                {
+                                    <li class="page-item @(i == Model.Page ? "active" : "")">
+                                        <a class="page-link" href="@Url.Action("Index", new { page = i, status = currentStatus })">@i</a>
+                                    </li>
+                                }
+                            </ul>
+                        </nav>
+                    }
+                }
+            </div>
+        </div>
+    </div>
+</div>

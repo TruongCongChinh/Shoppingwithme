@@ -1,0 +1,85 @@
+﻿@using SV22T1020040.Admin
+@using SV22T1020040.Shop
+@using SV22T1020040.Shop.Extensions
+@using SV22T1020040.Shop.Models
+@model SV22T1020040.Shop.Models.RegisterViewModel
+@{
+    ViewData["Title"] = "Đăng ký tài khoản";
+    Layout = "_Layout";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0"><i class="bi bi-person-plus"></i> Đăng ký tài khoản</h4>
+            </div>
+            <div class="card-body">
+                <form method="post" asp-action="Register">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                    <div class="mb-3">
+                        <label asp-for="CustomerName" class="form-label">Họ tên <span class="text-danger">*</span></label>
+                        <input asp-for="CustomerName" class="form-control" />
+                        <span asp-validation-for="CustomerName" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Email" class="form-label">Email <span class="text-danger">*</span></label>
+                        <input asp-for="Email" class="form-control" type="email" />
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Password" class="form-label">Mật khẩu <span class="text-danger">*</span></label>
+                        <input asp-for="Password" class="form-control" type="password" />
+                        <span asp-validation-for="Password" class="text-danger"></span>
+                        <div class="form-text">Mật khẩu phải có ít nhất 6 ký tự</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="ConfirmPassword" class="form-label">Xác nhận mật khẩu <span class="text-danger">*</span></label>
+                        <input asp-for="ConfirmPassword" class="form-control" type="password" />
+                        <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="ContactName" class="form-label">Tên giao dịch</label>
+                        <input asp-for="ContactName" class="form-control" />
+                        <div class="form-text">Để trống sẽ lấy theo Họ tên</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Phone" class="form-label">Điện thoại</label>
+                        <input asp-for="Phone" class="form-control" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Address" class="form-label">Địa chỉ</label>
+                        <textarea asp-for="Address" class="form-control" rows="2"></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Province" class="form-label">Tỉnh/Thành phố</label>
+                        <select asp-for="Province" class="form-select" asp-items="await SelectListHelper.Provinces()">
+                            <option value="">-- Chọn tỉnh/thành phố --</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="bi bi-check-circle"></i> Đăng ký
+                    </button>
+                </form>
+
+                <hr />
+                <div class="text-center">
+                    Đã có tài khoản? <a asp-action="Login">Đăng nhập ngay</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

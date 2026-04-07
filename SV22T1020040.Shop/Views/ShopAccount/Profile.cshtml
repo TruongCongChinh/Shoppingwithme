@@ -1,0 +1,80 @@
+﻿@using SV22T1020040.Admin
+@using SV22T1020040.Shop
+@using SV22T1020040.Shop.Extensions
+@using SV22T1020040.Shop.Models
+@model SV22T1020040.Shop.Models.UpdateProfileViewModel
+@{
+    ViewData["Title"] = "Thông tin cá nhân";
+    Layout = "_Layout";
+}
+
+<div class="row">
+    <div class="col-md-3">
+        <div class="list-group">
+            <a href="@Url.Action("Profile")" class="list-group-item list-group-item-action active">
+                <i class="bi bi-person"></i> Thông tin cá nhân
+            </a>
+            <a href="@Url.Action("ChangePassword")" class="list-group-item list-group-item-action">
+                <i class="bi bi-key"></i> Đổi mật khẩu
+            </a>
+            <a href="@Url.Action("Index", "Order")" class="list-group-item list-group-item-action">
+                <i class="bi bi-receipt"></i> Đơn hàng của tôi
+            </a>
+        </div>
+    </div>
+    <div class="col-md-9">
+        <div class="card shadow-sm">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="bi bi-pencil-square"></i> Thông tin cá nhân</h5>
+            </div>
+            <div class="card-body">
+                @if (TempData["SuccessMessage"] != null)
+                {
+                    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+                }
+
+                <form method="post" asp-action="Profile">
+                    <input type="hidden" asp-for="CustomerID" />
+
+                    <div class="mb-3">
+                        <label asp-for="CustomerName" class="form-label">Họ tên</label>
+                        <input asp-for="CustomerName" class="form-control" />
+                        <span asp-validation-for="CustomerName" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Email" class="form-label">Email</label>
+                        <input asp-for="Email" class="form-control" type="email" />
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="ContactName" class="form-label">Tên giao dịch</label>
+                        <input asp-for="ContactName" class="form-control" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Phone" class="form-label">Điện thoại</label>
+                        <input asp-for="Phone" class="form-control" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Address" class="form-label">Địa chỉ</label>
+                        <textarea asp-for="Address" class="form-control" rows="2"></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Province" class="form-label">Tỉnh/Thành phố</label>
+                        <select asp-for="Province" class="form-select" asp-items="await SelectListHelper.Provinces()">
+                            <option value="">-- Chọn tỉnh/thành phố --</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-save"></i> Cập nhật
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

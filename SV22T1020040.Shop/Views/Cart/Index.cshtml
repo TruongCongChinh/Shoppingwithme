@@ -1,0 +1,223 @@
+﻿@model List<SV22T1020040.Models.Shop.CartItem>
+@{
+    ViewData["Title"] = "Giỏ hàng của tôi";
+    decimal total = Model.Sum(x => x.TotalPrice);
+}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<style>
+    :root {
+        --primary-grad: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --glass-bg: rgba(255, 255, 255, 0.9);
+    }
+
+    body {
+        background-color: #f8f9fa;
+    }
+
+    /* Tiêu đề trang */
+    .cart-header {
+        background: var(--primary-grad);
+        color: white;
+        padding: 40px 0;
+        border-radius: 0 0 40px 40px;
+        margin-bottom: 30px;
+    }
+
+    /* Container giỏ hàng */
+    .cart-card {
+        background: #fff;
+        border: none;
+        border-radius: 24px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        overflow: hidden;
+    }
+
+    /* Item trong giỏ hàng */
+    .cart-item {
+        border-bottom: 1px solid #f1f3f5;
+        padding: 20px;
+        transition: 0.3s;
+    }
+
+        .cart-item:last-child {
+            border-bottom: none;
+        }
+
+        .cart-item:hover {
+            background-color: #fcfcfd;
+        }
+
+    .product-img {
+        width: 80px;
+        height: 80px;
+        object-fit: contain;
+        background: #f8f9fa;
+        border-radius: 15px;
+        padding: 5px;
+    }
+
+    .qty-input {
+        width: 80px;
+        border-radius: 10px;
+        border: 2px solid #eee;
+        text-align: center;
+        font-weight: 600;
+        transition: 0.3s;
+    }
+
+        .qty-input:focus {
+            border-color: #667eea;
+            box-shadow: none;
+        }
+
+    /* Tổng thanh toán */
+    .summary-box {
+        background: #f8f9fa;
+        border-radius: 20px;
+        padding: 25px;
+    }
+
+    .btn-gradient {
+        background: var(--primary-grad);
+        color: white;
+        border: none;
+        border-radius: 50px;
+        padding: 12px 30px;
+        font-weight: 600;
+        transition: 0.3s;
+    }
+
+        .btn-gradient:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+            color: white;
+        }
+
+    .empty-cart-icon {
+        font-size: 5rem;
+        background: var(--primary-grad);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 20px;
+    }
+</style>
+
+<div class="cart-header text-center shadow-sm">
+    <div class="container">
+        <h1 class="fw-bold"><i class="fa-solid fa-basket-shopping me-2"></i> Giỏ hàng của bạn</h1>
+        <p class="opacity-75">Quản lý các sản phẩm bạn đã chọn</p>
+    </div>
+</div>
+
+<div class="container mb-5">
+    @if (Model.Count == 0)
+    {
+        <div class="cart-card p-5 text-center animate__animated animate__fadeIn">
+            <i class="fa-solid fa-cart-ghost empty-cart-icon"></i>
+            <h3 class="fw-bold">Giỏ hàng đang trống!</h3>
+            <p class="text-muted">Có vẻ như bạn chưa chọn được sản phẩm nào.</p>
+            <a href="@Url.Action("Index", "Product")" class="btn btn-gradient mt-3">
+                <i class="fa-solid fa-arrow-left me-2"></i> Quay lại mua sắm
+            </a>
+        </div>
+    }
+    else
+    {
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <div class="cart-card p-2 animate__animated animate__fadeInLeft">
+                    <div class="d-none d-md-flex p-3 fw-bold text-muted border-bottom">
+                        <div style="flex: 2;">Sản phẩm</div>
+                        <div style="flex: 1;" class="text-center">Số lượng</div>
+                        <div style="flex: 1;" class="text-end">Thành tiền</div>
+                        <div style="width: 50px;"></div>
+                    </div>
+
+                    @foreach (var item in Model)
+                    {
+                        <div class="cart-item d-flex align-items-center flex-wrap">
+                            <div class="d-flex align-items-center flex-grow-1" style="flex-basis: 40%;">
+                                <img src="~/images/products/@(string.IsNullOrEmpty(item.Photo) ? "nophoto.png" : item.Photo)" class="product-img me-3">
+                                <div>
+                                    <h6 class="fw-bold mb-0">@item.ProductName</h6>
+                                    <small class="text-muted">Đơn giá: @item.SalePrice.ToString("#,##0") đ</small>
+                                </div>
+                            </div>
+
+                            <div class="text-center px-3" style="flex-basis: 25%;">
+                                <form method="post" asp-action="UpdateCart" class="d-inline-block">
+                                    <input type="hidden" name="productId" value="@item.ProductID" />
+                                    <input type="number" name="quantity" value="@item.Quantity" min="0"
+                                           class="form-control qty-input mx-auto"
+                                           onchange="this.form.submit()" />
+                                </form>
+                            </div>
+
+                            <div class="text-end px-3" style="flex-basis: 25%;">
+                                <span class="fw-bold text-primary fs-5">@item.TotalPrice.ToString("#,##0") đ</span>
+                            </div>
+
+                            <div class="text-center" style="width: 50px;">
+                                <form method="post" asp-action="RemoveFromCart">
+                                    <input type="hidden" name="productId" value="@item.ProductID" />
+                                    <button type="submit" class="btn btn-link text-danger p-0"
+                                            onclick="return confirm('Xóa sản phẩm này?')">
+                                        <i class="fa-solid fa-trash-can"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <div class="mt-4">
+                    <a href="@Url.Action("Index", "Product")" class="text-decoration-none fw-bold text-primary">
+                        <i class="fa-solid fa-chevron-left me-1"></i> Tiếp tục mua thêm sản phẩm khác
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="cart-card p-4 animate__animated animate__fadeInRight">
+                    <h5 class="fw-bold mb-4">Chi tiết thanh toán</h5>
+
+                    <div class="summary-box mb-4">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">Tạm tính:</span>
+                            <span>@total.ToString("#,##0") đ</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">Phí vận chuyển:</span>
+                            <span class="text-success">Miễn phí</span>
+                        </div>
+                        <hr>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="fw-bold">Tổng cộng:</span>
+                            <span class="text-danger fw-800 fs-4">@total.ToString("#,##0") đ</span>
+                        </div>
+                    </div>
+
+                    <a href="@Url.Action("Checkout")" class="btn btn-gradient w-100 mb-3 shadow-sm">
+                        <i class="fa-solid fa-credit-card me-2"></i>  THANH TOÁN
+                    </a>
+
+                    <form method="post" asp-action="ClearCart">
+                        <button type="submit" class="btn btn-outline-danger btn-sm w-100 rounded-pill"
+                                onclick="return confirm('Bạn muốn xóa toàn bộ giỏ hàng?')">
+                            <i class="fa-solid fa-trash me-1"></i> Xóa sạch giỏ hàng
+                        </button>
+                    </form>
+                </div>
+
+                <div class="mt-4 p-3 border rounded-4 bg-white shadow-sm">
+                    <div class="d-flex align-items-center mb-2 text-primary fw-bold">
+                        <i class="fa-solid fa-shield-halved me-2"></i> Bảo mật & An toàn
+                    </div>
+                    <small class="text-muted">Chúng tôi cam kết bảo mật thông tin và cung cấp dịch vụ đổi trả trong vòng 14 ngày nếu có lỗi kỹ thuật.</small>
+                </div>
+            </div>
+        </div>
+    }
+</div>

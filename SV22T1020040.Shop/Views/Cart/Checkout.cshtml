@@ -1,0 +1,80 @@
+﻿@using SV22T1020040.Admin
+@using SV22T1020040.Shop
+@using SV22T1020040.Shop.Extensions
+@using SV22T1020040.Shop.Models
+@model List<SV22T1020040.Models.Shop.CartItem>
+@{
+    ViewData["Title"] = "Thanh toán";
+    decimal total = Model.Sum(x => x.TotalPrice);
+}
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="bi bi-truck"></i> Thông tin giao hàng</h5>
+            </div>
+            <div class="card-body">
+                @if (TempData["Error"] != null)
+                {
+                    <div class="alert alert-danger">@TempData["Error"]</div>
+                }
+
+                <form method="post" asp-action="Checkout" id="checkoutForm">
+                    <div class="mb-3">
+                        <label class="form-label">Tỉnh/Thành phố <span class="text-danger">*</span></label>
+                        <select name="deliveryProvince" class="form-select" required>
+                            <option value="">-- Chọn tỉnh/thành phố --</option>
+                            @foreach (var province in await SelectListHelper.Provinces())
+                            {
+                                <option value="@province.Value">@province.Text</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Địa chỉ giao hàng <span class="text-danger">*</span></label>
+                        <textarea name="deliveryAddress" class="form-control" rows="3" placeholder="Số nhà, tên đường, ..." required></textarea>
+                    </div>
+
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i> Đơn hàng sẽ được xử lý sau khi bạn xác nhận thanh toán.
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card shadow-sm">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="bi bi-receipt"></i> Đơn hàng</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <strong>Số lượng sản phẩm:</strong> @Model.Sum(x => x.Quantity)
+                </div>
+                <hr />
+                <div class="mb-3">
+                    @foreach (var item in Model)
+                    {
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>@item.ProductName x @item.Quantity</span>
+                            <span>@item.TotalPrice.ToString("#,##0") đ</span>
+                        </div>
+                    }
+                </div>
+                <hr />
+                <div class="d-flex justify-content-between fw-bold fs-5">
+                    <span>Tổng cộng:</span>
+                    <span class="text-danger">@total.ToString("#,##0") đ</span>
+                </div>
+            </div>
+            <div class="card-footer">
+                <button type="submit" form="checkoutForm" class="btn btn-success w-100 btn-lg">
+                    <i class="bi bi-check-circle"></i> Xác nhận đặt hàng
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

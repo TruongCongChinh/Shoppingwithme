@@ -1,0 +1,128 @@
+﻿@using SV22T1020040.Models.Sales
+@using SV22T1020040.Shop
+@using SV22T1020040.Shop.Extensions
+@using SV22T1020040.Shop.Models
+@model SV22T1020040.Models.Sales.OrderViewInfo
+@{
+    ViewData["Title"] = $"Chi tiết đơn hàng #{Model.OrderID}";
+    var details = ViewBag.Details as List<SV22T1020040.Models.Sales.OrderDetailViewInfo>;
+    decimal total = details?.Sum(x => x.TotalPrice) ?? 0;
+}
+
+<div class="row">
+    <div class="col-md-3">
+        <div class="list-group">
+            <a href="@Url.Action("Profile", "ShopAccount")" class="list-group-item list-group-item-action">
+                <i class="bi bi-person"></i> Thông tin cá nhân
+            </a>
+            <a href="@Url.Action("ChangePassword", "ShopAccount")" class="list-group-item list-group-item-action">
+                <i class="bi bi-key"></i> Đổi mật khẩu
+            </a>
+            <a href="@Url.Action("Index", "Order")" class="list-group-item list-group-item-action active">
+                <i class="bi bi-receipt"></i> Đơn hàng của tôi
+            </a>
+        </div>
+    </div>
+    <div class="col-md-9">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="bi bi-receipt"></i> Chi tiết đơn hàng #@Model.OrderID</h5>
+                <span class="badge bg-light text-dark">
+                    @Model.OrderTime.ToString("dd/MM/yyyy HH:mm")
+                </span>
+            </div>
+            <div class="card-body">
+                @if (TempData["Success"] != null)
+                {
+                    <div class="alert alert-success">@TempData["Success"]</div>
+                }
+                @if (TempData["Error"] != null)
+                {
+                    <div class="alert alert-danger">@TempData["Error"]</div>
+                }
+
+                <div class="alert @(Model.Status == OrderStatusEnum.Completed ? "alert-success" :
+                                                                     Model.Status == OrderStatusEnum.Cancelled || Model.Status == OrderStatusEnum.Rejected ? "alert-danger" :
+                                                                     "alert-info")">
+                    <div class="d-flex align-items-center">
+                        <i class="bi @(Model.Status == OrderStatusEnum.Completed ? "bi-check-circle-fill" :
+                                                                                 Model.Status == OrderStatusEnum.Cancelled || Model.Status == OrderStatusEnum.Rejected ? "bi-x-circle-fill" :
+                                                                                 "bi-hourglass-split") fs-2 me-3"></i>
+                        <div>
+                            <strong>Trạng thái đơn hàng:</strong> @Model.Status.GetDescription()
+                            @if (Model.FinishedTime.HasValue)
+                            {
+                                <span class="ms-2">(lúc @Model.FinishedTime.Value.ToString("dd/MM/yyyy HH:mm"))</span>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <h6><i class="bi bi-person"></i> Thông tin khách hàng</h6>
+                        <p class="mb-0"><strong>@Model.CustomerName</strong></p>
+                        <p class="mb-0">@Model.CustomerPhone</p>
+                        <p class="mb-0">@Model.CustomerEmail</p>
+                        <p>@Model.CustomerAddress</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6><i class="bi bi-truck"></i> Thông tin giao hàng</h6>
+                        <p class="mb-0">@Model.DeliveryAddress</p>
+                        <p>@Model.DeliveryProvince</p>
+                        @if (!string.IsNullOrEmpty(Model.ShipperName))
+                        {
+                            <p class="mb-0 text-success">
+                                <i class="bi bi-bicycle"></i> Người giao: @Model.ShipperName - @Model.ShipperPhone
+                            </p>
+                        }
+                    </div>
+                </div>
+
+                <h6><i class="bi bi-box-seam"></i> Danh sách sản phẩm</h6>
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Sản phẩm</th>
+                                <th class="text-center">ĐVT</th>
+                                <th class="text-center">Số lượng</th>
+                                <th class="text-end">Đơn giá</th>
+                                <th class="text-end">Thành tiền</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in details)
+                            {
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <img src="~/images/products/@item.Photo" style="width: 50px; height: 50px; object-fit: cover;" class="me-2">
+                                            @item.ProductName
+                                        </div>
+                                    </td>
+                                    <td class="text-center">@item.Unit</td>
+                                    <td class="text-center">@item.Quantity</td>
+                                    <td class="text-end">@item.SalePrice.ToString("#,##0") đ</td>
+                                    <td class="text-end fw-bold">@item.TotalPrice.ToString("#,##0") đ</td>
+                                </tr>
+                            }
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <th colspan="4" class="text-end">Tổng cộng:</th>
+                                <th class="text-end text-danger fs-5">@total.ToString("#,##0") đ</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+
+                <div class="mt-3">
+                    <a href="@Url.Action("Index")" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left"></i> Quay lại
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
